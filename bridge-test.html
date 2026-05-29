@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>inDrive WebView Bridge Validation PoC</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 32px;
+      background: #111;
+      color: #eee;
+      text-align: center;
+    }
+    h1 { color: #7CFF7C; }
+    .box {
+      background: #1d1d1d;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 16px;
+      border: 1px solid #444;
+      text-align: left;
+    }
+    code { color: #7CFF7C; word-break: break-all; }
+    pre { color: #7CFF7C; white-space: pre-wrap; word-break: break-word; }
+  </style>
+</head>
+<body>
+  <h1>inDrive WebView Validation PoC</h1>
+
+  <div class="box">
+    <p><strong>Status:</strong> External page loaded through inDrive deep link.</p>
+    <code>indriver://web?url=https://YOUR-DOMAIN/bridge-test.html</code>
+  </div>
+
+  <div class="box">
+    <p><strong>Purpose:</strong></p>
+    <p>
+      This page safely validates whether externally controlled content can be rendered
+      inside the inDrive internal WebView and whether JavaScript bridge objects are exposed.
+    </p>
+    <p>
+      This PoC does not call native methods, access camera, change clipboard, collect credentials,
+      or modify user/device data.
+    </p>
+  </div>
+
+  <div class="box">
+    <p><strong>Detected JavaScript bridge objects:</strong></p>
+    <pre id="result">Checking...</pre>
+  </div>
+
+  <script>
+    const possibleInterfaces = [
+      "Android",
+      "inDrive",
+      "InDrive",
+      "JsInterface",
+      "WebViewBridge",
+      "Bridge",
+      "NativeBridge",
+      "JavascriptBridge",
+      "JSBridge"
+    ];
+
+    const detected = [];
+
+    possibleInterfaces.forEach(function(name) {
+      try {
+        if (typeof window[name] !== "undefined") {
+          detected.push(name);
+          console.log("Bridge object detected:", name);
+        }
+      } catch (e) {
+        console.log("Error checking bridge:", name, e);
+      }
+    });
+
+    const result = document.getElementById("result");
+
+    if (detected.length > 0) {
+      result.textContent =
+        "Bridge object(s) detected: " + detected.join(", ") +
+        "\n\nNo native methods were invoked by this PoC.";
+      alert("Bridge object detected: " + detected.join(", ") + "\nNo native methods were invoked.");
+    } else {
+      result.textContent =
+        "No known bridge object was detected from this external page.\n" +
+        "The page still confirms that external content can be loaded through the deep link.";
+      alert("External page loaded. No known bridge object detected.");
+    }
+  </script>
+</body>
+</html>
