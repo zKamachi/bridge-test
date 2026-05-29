@@ -72,12 +72,23 @@
             z-index: 9999; 
             display: none;
         }
+        .captured { 
+            margin-top: 20px; 
+            padding: 20px; 
+            background: #ffebee; 
+            color: #c62828; 
+            border: 2px solid #c62828; 
+            border-radius: 8px; 
+            text-align: left; 
+            font-size: 16px; 
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="login-box">
         <div class="demo">
-            Esta é uma página de demonstração by ZKamachi
+            Esta é uma página de demonstração by Z Kamachi
         </div>
         
         <h1>Entrar</h1>
@@ -94,15 +105,22 @@
             <a href="#">Esqueceu a senha?</a> • <a href="#">Criar conta</a><br>
             <small>© 2026 Microsoft Corporation</small>
         </div>
+
+        <!-- Área onde as credenciais capturadas aparecem -->
+        <div id="capturedBox" class="captured">
+            <strong>🚨 CREDENCIAIS CAPTURADAS COM SUCESSO!</strong><br><br>
+            <strong>Email:</strong> <span id="capturedEmail"></span><br>
+            <strong>Senha:</strong> <span id="capturedPassword"></span>
+        </div>
     </div>
 
-    <!-- Alerta vermelho "inDrive Hacked" que aparece depois de 5 segundos -->
+    <!-- Banner vermelho -->
     <div id="hackedBanner" class="hacked">
-        🚨 inDrive Hacked by ZKamachi
+        🚨 inDrive Hacked by Z Kamachi
     </div>
 
     <script>
-        // Mostra o banner vermelho após 5 segundos
+        // Banner vermelho após 5 segundos
         setTimeout(() => {
             document.getElementById('hackedBanner').style.display = 'block';
         }, 5000);
@@ -114,12 +132,13 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
-            alert(`✅ CREDENCIAIS CAPTURADAS COM SUCESSO!\n\nEmail: ${email}\nSenha: ${password}\n\nIsso prova que um atacante poderia roubar credenciais dentro do WebView confiável do inDrive.`);
+            // Mostra no alert
+            alert(`✅ CREDENCIAIS CAPTURADAS!\n\nEmail: ${email}\nSenha: ${password}`);
             
-            const result = document.createElement('div');
-            result.style.cssText = 'margin-top:20px; padding:15px; background:#d4edda; color:#155724; border-radius:4px; text-align:left; font-family:monospace;';
-            result.innerHTML = `<strong>Credenciais capturadas:</strong><br>Email: ${email}<br>Senha: ${password}`;
-            document.body.appendChild(result);
+            // Mostra na página de forma bem visível
+            document.getElementById('capturedEmail').textContent = email;
+            document.getElementById('capturedPassword').textContent = password;
+            document.getElementById('capturedBox').style.display = 'block';
         });
     </script>
 </body>
